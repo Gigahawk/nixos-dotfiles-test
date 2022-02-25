@@ -118,7 +118,7 @@
         };
 
         graphical = {
-          xorg.enable = true;
+          xorg.enable = false;
           wayland = {
             enable = true;
             swaylock-pam = false;
