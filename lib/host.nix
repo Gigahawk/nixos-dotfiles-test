@@ -83,7 +83,7 @@ with builtins;
           boot.kernelPatches = kernelPatches;
 
           nixpkgs.pkgs = pkgs;
-          nix.maxJobs = lib.mkDefault cpuCores;
+          nix.settings.max-jobs = lib.mkDefault cpuCores;
 
           system.stateVersion = stateVersion;
         }
