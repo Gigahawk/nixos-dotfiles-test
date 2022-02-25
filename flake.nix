@@ -178,9 +178,9 @@
                 screenlock.enable = true;
               };
               xorg = {
-                enable = true;
+                enable = false;
                 type = "dwm";
-                screenlock.enable = true;
+                screenlock.enable = false;
               };
             };
             applications.enable = true;
