@@ -116,6 +116,14 @@
             enable = false;
           };
         };
+
+        graphical = {
+          xorg.enable = false;
+          wayland = {
+            enable = false;
+            swaylock-pam = false;
+          };
+        };
       };
 
       laptopConfig = defaultConfig // {
