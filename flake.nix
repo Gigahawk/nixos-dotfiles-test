@@ -143,7 +143,7 @@
       };
 
       defaultUser = [{
-        name = "jd";
+        name = "jasper";
         groups = [ "wheel" "networkmanager" "video" ];
         uid = 1000;
         shell = pkgs.zsh;
@@ -162,7 +162,7 @@
         };
       };
       homeManagerConfigurations = {
-        jd = user.mkHMUser {
+        jasper = user.mkHMUser {
           userConfig = {
             graphical = {
               applications = {
@@ -201,7 +201,7 @@
             keybase.enable = true;
             pijul.enable = true;
           };
-          username = "jd";
+          username = "jasper";
         };
       };
 
