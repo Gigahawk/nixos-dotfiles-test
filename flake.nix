@@ -109,6 +109,13 @@
 
       vboxConfig = defaultConfig // {
         boot = "efi";
+
+        gnome = {
+          enable = false;
+          keyring = {
+            enable = false;
+          };
+        };
       };
 
       laptopConfig = defaultConfig // {
