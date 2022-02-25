@@ -107,11 +107,16 @@
         android.enable = true;
       };
 
+      vboxConfig = defaultConfig // {
+        boot = "efi";
+      };
+
       laptopConfig = defaultConfig // {
         laptop = {
           enable = true;
         };
       };
+
 
       frameworkConfig = laptopConfig // {
         framework = {
@@ -186,6 +191,19 @@
       };
 
       nixosConfigurations = {
+        nixosVbox = host.mkHost {
+          name = "nixosVbox";
+          NICs = [ "enp0s3" ];
+          kernelPackage = pkgs.linuxPackages;
+          initrdMods = [ "ata_piix" "ohci_pci" "sd_mod" "sr_mod" ];
+          kernelMods = [ ];
+          kernelParams = [ ];
+          kernelPatches = [ ];
+          systemConfig = vboxConfig;
+          users = defaultUser;
+          cpuCores = 6;
+        };
+
         laptop = host.mkHost {
           name = "laptop";
           NICs = [ "enp0s31f6" "wlp2s0" ];

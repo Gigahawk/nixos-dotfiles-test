@@ -7,63 +7,68 @@ in
 {
   options.jd.boot = mkOption {
     description = "Type of boot. Default encrypted-efi";
-    default = null;
-    type = types.enum [ "encrypted-efi" ];
+    default = "encrypted-efi";
+    type = types.enum [ "encrypted-efi" "efi" ];
   };
 
-  config = mkIf (cfg == "encrypted-efi") {
-    boot.loader = {
-      efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
+  config = mkIf (cfg == "encrypted-efi" || cfg == "efi") (mkMerge
+  [
+    {
+      boot.loader = {
+        efi = {
+          canTouchEfiVariables = true;
+          efiSysMountPoint = "/boot";
+        };
+
+        grub = {
+          enable = true;
+          devices = [ "nodev" ];
+          efiSupport = true;
+          useOSProber = true;
+          version = 2;
+          extraEntries = ''
+            menuentry "Reboot" {
+              reboot
+            }
+            menuentry "Power off" {
+              halt
+            }
+          '';
+          extraConfig = if (config.jd.framework.enable) then "i915.enable_psr=0" else "";
+        };
       };
 
-      grub = {
-        enable = true;
-        devices = [ "nodev" ];
-        efiSupport = true;
-        useOSProber = true;
-        version = 2;
-        extraEntries = ''
-          menuentry "Reboot" {
-            reboot
-          }
-          menuentry "Power off" {
-            halt
-          }
-        '';
-        extraConfig = if (config.jd.framework.enable) then "i915.enable_psr=0" else "";
-      };
-    };
-
-    boot.initrd.luks.devices = {
-      cryptkey = {
-        device = "/dev/disk/by-label/NIXKEY";
-      };
-
-      cryptroot = {
+      fileSystems."/" = {
         device = "/dev/disk/by-label/NIXROOT";
-        keyFile = "/dev/mapper/cryptkey";
+        fsType = "ext4";
       };
 
-      cryptswap = {
-        device = "/dev/disk/by-label/NIXSWAP";
-        keyFile = "/dev/mapper/cryptkey";
+      fileSystems."/boot" = {
+        device = "/dev/disk/by-label/BOOT";
+        fsType = "vfat";
       };
-    };
 
-    fileSystems."/" = {
-      device = "/dev/disk/by-label/DECRYPTNIXROOT";
-      fsType = "ext4";
-    };
+      swapDevices = [
+        { device = "/dev/disk/by-label/NIXSWAP"; }
+      ];
+    }
 
-    fileSystems."/boot" = {
-      device = "/dev/disk/by-label/BOOT";
-      fsType = "vfat";
-    };
+    (mkIf (cfg == "encrypted-efi") {
+      boot.initrd.luks.devices = {
+        cryptkey = {
+          device = "/dev/disk/by-label/NIXKEY";
+        };
 
-    swapDevices = [
-      { device = "/dev/disk/by-label/DECRYPTNIXSWAP"; }
-    ];
-  };
+        cryptroot = {
+          device = "/dev/disk/by-label/NIXROOT";
+          keyFile = "/dev/mapper/cryptkey";
+        };
+
+        cryptswap = {
+          device = "/dev/disk/by-label/NIXSWAP";
+          keyFile = "/dev/mapper/cryptkey";
+        };
+      };
+    })
+  ]);
 }
